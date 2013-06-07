@@ -53,12 +53,6 @@ class WCMessage(dict):
 
         top_element = doc.documentElement
         make_nodes(top_element, self)
-        '''
-        f = file("t", "w+")
-        top_element.writexml(f, newl='\n')
-        f.seek(0)
-        return f.read()
-        '''
         return top_element.toxml()
 
     def __setattr__(self, attr, value):

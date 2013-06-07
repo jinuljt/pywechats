@@ -10,7 +10,7 @@ from hashlib import sha1
 class WeChatAuth(object):
     def __init__(self, token, min_seconds, max_seconds):
         '''
-        bucket will delete nonce which overtime then past_seconds
+        bucket will delete nonce which overtime then min_seconds
         '''
         self.min_seconds=min_seconds
         self.max_seconds=max_seconds
