@@ -103,4 +103,4 @@ class WCMusicMessage(WCMessage):
         self.Music = {"Title": title,
                       "Description": description,
                       "MusicUrl": url,
-                      "HQMusicUrl": hq_url}}
+                      "HQMusicUrl": hq_url}
