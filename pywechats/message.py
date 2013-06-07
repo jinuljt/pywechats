@@ -31,14 +31,10 @@ class WCMessage(dict):
     def to_xml(self):
         def make_nodes(node, d):
             for k, v in d.iteritems():
+                child = doc.createElement(k)                    
                 if type(v) == list:
                     for cd in v:
-                        child = doc.createElement(k)                    
                         make_nodes(child, cd)
-                        node.appendChild(child)
-                    continue
-                
-                child = doc.createElement(k)
                 if type(v) == str or type(v) == unicode:
                     qv = v.encode('utf-8') if isinstance(v, unicode) else str(v)
                     child.appendChild(doc.createCDATASection(qv))
@@ -61,7 +57,7 @@ class WCMessage(dict):
     def __getattr__(self, attr):
         return self[attr]
 
-class WCPlainMessage(WCMessage):
+class WCTextMessage(WCMessage):
     
     def __init__(self, msg, star=False):
         self.ToUserName = msg.FromUserName
@@ -69,3 +65,42 @@ class WCPlainMessage(WCMessage):
         self.MsgType = "text"
         self.CreateTime = int(time.time())
         self.FuncFlag = 1 if star else 0
+
+    def add_content(self, content):
+        self.Content = content
+
+
+class WCNewsMessage(WCMessage):
+
+    def __init__(self, msg, star=False):
+        self.ToUserName = msg.FromUserName
+        self.FromUserName = msg.ToUserName
+        self.MsgType = "news"
+        self.CreateTime = int(time.time())
+        self.FuncFlag = 1 if star else 0
+        self.ArticleCount = 0
+        self.Articles = []
+
+    def add_article(self, title, description, pic_url, url):
+        item = {"item":{"Title": title,
+                        "Description": description,
+                        "PicUrl": pic_url,
+                        "Url": url}}
+        self.Articles.append(item)
+        self.ArticleCount += 1
+
+class WCMusicMessage(WCMessage):
+    
+    def __init__(self, msg, star=False):
+        self.ToUserName = msg.FromUserName
+        self.FromUserName = msg.ToUserName
+        self.MsgType = "music"
+        self.CreateTime = int(time.time())
+        self.FuncFlag = 1 if star else 0
+        self.Music = {}
+
+    def add_article(self, title, description, url, hq_url):
+        self.Music = {"Title": title,
+                      "Description": description,
+                      "MusicUrl": url,
+                      "HQMusicUrl": hq_url}}

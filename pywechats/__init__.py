@@ -8,11 +8,12 @@
 __all__ = ['__version__',
            '__author__',
            "WeChatServer",
-           "WCPlainMessage",
+           "WCTextMessage",
+           "WCNewsMessage",
            "WCMessage"]
 
 from .wechat import WeChatServer
-from .message import WCPlainMessage, WCMessage
+from .message import WCTextMessage, WCMessage, WCNewsMessage
 
 __version__ = "0.0.1"
 __author__ = "Juntao Liu"

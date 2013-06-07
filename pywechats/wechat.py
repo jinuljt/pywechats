@@ -15,13 +15,16 @@ MIN_SECONDS=30
 MAX_SECONDS=30
 
 EVENT_DEFAULT="default"
-EVENT_TYPE="event"
+EVENT_MSG="event"
+COMMAND_MSG="command"
+TEXT_MSG="text"
 
 
 class WeChatServer(object):
     def __init__(self, token):
         self.handlers = {}
         self.handler_default = None
+        self.has_command = False
         self.token = token
         self.auth = WeChatAuth(token, MIN_SECONDS, MAX_SECONDS)
 
@@ -35,19 +38,33 @@ class WeChatServer(object):
         self.handlers[name] = handler
 
     def register_event(self, event, handler, key=EVENT_DEFAULT):
-        if not self.handlers.has_key(EVENT_TYPE): self.handlers[EVENT_TYPE] = {}
-        if not self.handlers[EVENT_TYPE].has_key(event):
-            self.handlers[EVENT_TYPE][event] = {}
-        self.handlers[EVENT_TYPE][event][key] = handler
+        if not self.handlers.has_key(EVENT_MSG): self.handlers[EVENT_MSG] = {}
+        if not self.handlers[EVENT_MSG].has_key(event):
+            self.handlers[EVENT_MSG][event] = {}
+        self.handlers[EVENT_MSG][event][key] = handler
+
+    def register_command(self, command, handler):
+        self.has_command = True
+        if not self.handlers.has_key(COMMAND_MSG):
+            self.handlers[COMMAND_MSG] = {}
+        self.handlers[COMMAND_MSG][command.lower()] = handler
 
     def feed(self, data):
         msg = WCMessage(data)
         handler = self.handlers.get(msg.get('MsgType', ""))
         if handler:
-            if msg.get('MsgType', "") == "event":
+            if msg.get('MsgType', "") == COMMAND_MSG:
                 handler = handler.get(msg.get('Event'))
                 if handler:
                     handler = handler.get(msg.get('EventKey') or EVENT_DEFAULT)
+            elif (self.has_command and
+                  msg.get('MsgType', "") == TEXT_MSG and
+                  msg.has_key('Content')):
+                cs = msg['Content'].split(" ")
+                if len(cs) >= 2:
+                    command = cs[0].lower()
+                    handler = self.handlers[COMMAND_MSG].get(command, handler)
+                    msg['Content'] = " ".join(cs[1:])
         handler = handler or self.handler_default
         if not handler: return None
         return handler(msg)
