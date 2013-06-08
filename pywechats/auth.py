@@ -42,6 +42,6 @@ class WeChatAuth(object):
 
     def clean_bucket(self, timestamp):
         new_bucket = {}
-        for k,v in self.bucket.interitems():
+        for k,v in self.bucket.iteritems():
             if v >= timestamp: new_bucket[k] = v
         self.bucket = new_bucket
